@@ -45,10 +45,12 @@
                             name="loginPassword"
                             v-model="login_password"
                             prepend-icon="lock"
-                            type="password"
+                            :append-icon="showPasswordSignIn ? 'mdi-eye-off' : 'mdi-eye'"
+                            :type="showPasswordSignIn ? 'text' : 'password'"
                             color="blue"
                             clearable
                             required
+                            @click:append="showPasswordSignIn = !showPasswordSignIn"
                           ></v-text-field>
 
                           <h3 class="text-center mt-3">
@@ -134,10 +136,12 @@
                             name="signupPassword"
                             v-model="signup_password"
                             prepend-icon="lock"
-                            type="password"
+                            :append-icon="showPasswordSignup ? 'mdi-eye-off' : 'mdi-eye'"
+                            :type="showPasswordSignup ? 'text' : 'password'"
                             color="blue"
                             clearable
                             required
+                            @click:append="showPasswordSignup = !showPasswordSignup"
                           ></v-text-field>
 
                           <div class="text-center mt-5">
@@ -159,14 +163,16 @@
 
 <script>
 export default {
-  name: "Home",
+  name: "SignInSignUp",
   data: () => ({
     step: 1,
     login_email: null,
     login_password: null,
     signup_name: null,
     signup_email: null,
-    signup_password: null
+    signup_password: null,
+    showPasswordSignIn: false,
+    showPasswordSignup: false
   }),
   props: {
     source: String
