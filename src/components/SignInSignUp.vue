@@ -1,7 +1,11 @@
 <template>
-  <v-app>
-    <v-content>
-      <v-container class="fill-height" fluid>
+  <div class="text-center">
+    <v-dialog v-model="dialog" width="100%">
+      <template v-slot:activator="{ on }">
+        <v-btn x-large class="primary mt-4" dark v-on="on">Open Dialog</v-btn>
+      </template>
+      <v-card>
+        <v-container class="fill-height" fluid>
         <v-row align="center" justify="center">
           <v-col cols="12" sm="8" md="8">
             <v-card class="elevation-12">
@@ -58,7 +62,7 @@
                           </h3>
 
                           <div class="text-center mt-3">
-                            <v-btn type="submit" large dark color="blue" rounded>SIGN IN</v-btn>
+                            <v-btn type="submit" x-large dark color="blue" rounded>SIGN IN</v-btn>
                           </div>
                         </form>
                       </v-card-text>
@@ -145,7 +149,7 @@
                           ></v-text-field>
 
                           <div class="text-center mt-5">
-                            <v-btn type="submit" large dark color="blue" rounded>SIGN UP</v-btn>
+                            <v-btn type="submit" x-large dark color="blue" rounded>SIGN UP</v-btn>
                           </div>
                         </form>
                       </v-card-text>
@@ -157,14 +161,15 @@
           </v-col>
         </v-row>
       </v-container>
-    </v-content>
-  </v-app>
+      </v-card>
+    </v-dialog>
+  </div>
 </template>
 
 <script>
 export default {
-  name: "SignInSignUp",
   data: () => ({
+    dialog: false,
     step: 1,
     login_email: null,
     login_password: null,
@@ -174,9 +179,6 @@ export default {
     showPasswordSignIn: false,
     showPasswordSignup: false
   }),
-  props: {
-    source: String
-  },
   methods: {
     async signIn() {
       if (this.login_email && this.login_password) {
@@ -199,4 +201,3 @@ export default {
   }
 };
 </script>
-
