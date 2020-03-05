@@ -199,6 +199,11 @@
           </v-col>
         </v-row>
       </v-container>
+
+      <v-snackbar v-model="snackbar" :color="snackbarType" :timeout="timeout">
+        {{ snackbarText }}
+        <v-btn text @click="snackbar = false">Close</v-btn>
+      </v-snackbar>
     </v-content>
   </v-app>
 </template>
@@ -213,6 +218,10 @@ export default {
   data: () => ({
     step: 1,
     loading: false,
+    snackbar: false,
+    snackbarType: "success",
+    timeout: 4000,
+    snackbarText: "",
     FacebookBtnloading: false,
     GoogleBtnloading: false,
     TwitterBtnloading: false,
@@ -243,31 +252,47 @@ export default {
             localStorage.setItem("isAuthenticatedWithEmail", "true");
             // checking if email address is verified
             if (result.user.emailVerified === false) {
-              
               // Show success message and redirect the user to sign in
-            this.$fire({
-              title: "Please verify your email address",
-              input: "email",
-              text: "In order to complete the sign-up process, please enter bellow your email address and click the activation link.",
-              type: "info",
-              showCancelButton: true,
-              }).then((email) => {
+              this.$fire({
+                title: "Please verify your email address",
+                input: "email",
+                text:
+                  "In order to complete the sign-up process, please enter below your email address and click the activation link in email sent.",
+                type: "info",
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-envelope"></i> Send email',
+                cancelButtonText: '<i class="fas fa-times-circle"></i> Cancel',
+              }).then(email => {
                 this.loading = false;
                 if (email) {
-                  console.log(email.value)
+                  console.log(email.value);
+                  // let auth = firebase.auth()
+                  // auth.getUserByEmail(email.value)
+                  // .then(function(userRecord) {
+                  //   // See the UserRecord reference doc for the contents of userRecord.
+                  //   console.log('Successfully fetched user data:', userRecord.toJSON());
+                  // })
+                  // .catch(function(error) {
+                  // console.log('Error fetching user data:', error);
+                  // });
+                  // firebase.sendEmailVerification().then(() => {
+                  //   localStorage.setItem(`emailVerificationSent`, `true`)
+                  // })
                 }
               });
-
             } else {
               setTimeout(() => {
-              this.loading = false;
-              // redirecting user to Dashboard page
-              this.$router.push({ name: "Dashboard" });
-            }, 1500);
+                this.loading = false;
+                // redirecting user to Dashboard page
+                this.$router.push({ name: "Dashboard" });
+              }, 1500);
             }
           })
           .catch(error => {
-            console.log(error.message);
+            this.snackbar = true;
+            this.snackbarType = "error";
+            this.snackbarText = error.message;
+            this.loading = false;
           });
       } else {
         console.log("No data");
@@ -286,18 +311,21 @@ export default {
           .then(() => {
             // Sending the email Verification to the user
             let user = firebase.auth().currentUser;
-            user.sendEmailVerification().then(function() {
-              localStorage.setItem(`emailVerificationSent`, `true`)
-            }).catch(function(error) {
-              this.$fire({
-                title: "Error",
-                text: error.message,
-                type: "error",
-                timer: 8000
-              }).then(() => {
-                this.loading = false;
+            user
+              .sendEmailVerification()
+              .then(function() {
+                localStorage.setItem(`emailVerificationSent`, `true`);
+              })
+              .catch(function(error) {
+                this.$fire({
+                  title: "Error",
+                  text: error.message,
+                  type: "error",
+                  timer: 8000
+                }).then(() => {
+                  this.loading = false;
+                });
               });
-            });
 
             // Saving displayName
             firebase.auth().currentUser.updateProfile({
@@ -308,10 +336,11 @@ export default {
 
             // Show success message and redirect the user to sign in
             this.$fire({
-            title: "You have signed up successfully",
-            text: "Welcome to OpenAuth! We are glad you are with us! We have sent an email with an activation link to your email address. In order to complete the sign-up process, please click the activation link.",
-            type: "success",
-            timer: 6000
+              title: "You have signed up successfully",
+              text:
+                "Welcome to OpenAuth! We are glad you are with us! We have sent an email with an activation link to your email address. In order to complete the sign-up process, please click the activation link.",
+              type: "success",
+              timer: 6000
             }).then(() => {
               this.loading = false;
               document.getElementById("signInButton").click();
@@ -319,13 +348,13 @@ export default {
           })
           .catch(error => {
             this.$fire({
-            title: "Error",
-            text: error.message,
-            type: "error",
-            timer: 8000
-          }).then(() => {
-            this.loading = false;
-          });
+              title: "Error",
+              text: error.message,
+              type: "error",
+              timer: 8000
+            }).then(() => {
+              this.loading = false;
+            });
           });
       } else {
         console.log("No data");
