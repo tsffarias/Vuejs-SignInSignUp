@@ -61,7 +61,19 @@ const routes = [
     name: 'Dashboard',
     beforeEnter: guardMyroute,
     component: () => import( /* webpackChunkName: "dashboard" */ '../views/Dashboard.vue')
-  }
+  }, 
+  {
+    path: '/profile',
+    name: 'Profile',
+    beforeEnter: guardMyroute,
+    component: () => import( /* webpackChunkName: "profile" */ '../views/system/users/Profile.vue')
+  },
+   {
+     path: '/user-settings',
+     name: 'UserSettings',
+     beforeEnter: guardMyroute,
+     component: () => import( /* webpackChunkName: "userSettings" */ '../views/system/users/UserSettings.vue')
+   },
 ]
 
 const router = new VueRouter({

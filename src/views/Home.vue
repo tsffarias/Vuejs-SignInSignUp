@@ -249,42 +249,40 @@ export default {
             console.log(result);
             localStorage.setItem("OpenAuth-user", JSON.stringify(result.user));
 
-            localStorage.setItem("isAuthenticatedWithEmail", "true");
             // checking if email address is verified
             if (result.user.emailVerified === false) {
-              // Show success message and redirect the user to sign in
+              // Sending the email Verification to the user
+              let user = firebase.auth().currentUser;
+              user.sendEmailVerification().then(function() {
+                localStorage.setItem(`emailVerificationSent`, `true`);
+              })
+              .catch(function(error) {
+                this.$fire({
+                  title: "Error",
+                  text: error.message,
+                  type: "error",
+                  timer: 8000
+                }).then(() => {
+                  this.loading = false;
+                });
+              });
+
+              // Show info message and redirect the user to sign in
               this.$fire({
                 title: "Please verify your email address",
-                input: "email",
                 text:
-                  "In order to complete the sign-up process, please enter below your email address and click the activation link in email sent.",
+                  "We have sent an email with an activation link to your email address. In order to complete the sign-up process, please click the activation link.",
                 type: "info",
-                showCancelButton: true,
-                confirmButtonText: '<i class="fas fa-envelope"></i> Send email',
-                cancelButtonText: '<i class="fas fa-times-circle"></i> Cancel',
-              }).then(email => {
-                this.loading = false;
-                if (email) {
-                  console.log(email.value);
-                  // let auth = firebase.auth()
-                  // auth.getUserByEmail(email.value)
-                  // .then(function(userRecord) {
-                  //   // See the UserRecord reference doc for the contents of userRecord.
-                  //   console.log('Successfully fetched user data:', userRecord.toJSON());
-                  // })
-                  // .catch(function(error) {
-                  // console.log('Error fetching user data:', error);
-                  // });
-                  // firebase.sendEmailVerification().then(() => {
-                  //   localStorage.setItem(`emailVerificationSent`, `true`)
-                  // })
-                }
-              });
+                confirmButtonText: '<i class="fa fa-thumbs-up"></i> OK!',
+              }).then(() => {
+                this.loading = false;                
+              })
             } else {
               setTimeout(() => {
                 this.loading = false;
+                localStorage.setItem("isAuthenticatedWithEmail", "true");
                 // redirecting user to Dashboard page
-                this.$router.push({ name: "Dashboard" });
+                this.$router.push({ name: "Dashboard" })
               }, 1500);
             }
           })

@@ -41,7 +41,11 @@
       <v-menu :open-on-hover="openOnHover" offset-y>
         <template v-slot:activator="{ on }">
           <v-btn flat v-on="on" text>
-            <v-icon x-large color="grey">mdi-account-circle</v-icon>
+            <v-icon v-if="user.photoURL == ''" x-large color="grey">mdi-account-circle</v-icon>
+
+            <v-avatar class="profile" size="40">
+              <img :src="user.photoURL">
+            </v-avatar>
           </v-btn>
         </template>
         <v-list class="mb-4">
@@ -89,7 +93,11 @@
       <v-layout column align-center>
         <router-link to="profile" class="removeUnderline">
           <v-flex class="text-center mt-5 mb-4">
-            <v-icon color="grey" size="110">mdi-account-circle</v-icon>
+            <v-icon v-if="user.photoURL == ''" color="grey" size="110">mdi-account-circle</v-icon>
+
+            <v-avatar class="profile" size="90">
+              <img :src="user.photoURL">
+            </v-avatar>
           </v-flex>
           <p v-if="!user" class="black--text subheading mt-3">User E-mail</p>
           <p v-if="user" class="black--text subheading mt-3">{{ user.displayName }}</p>
