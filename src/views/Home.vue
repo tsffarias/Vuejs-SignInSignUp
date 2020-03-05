@@ -22,13 +22,34 @@
                           >
                             <v-icon>fab fa-facebook-f</v-icon>
                           </v-btn>
-                          <v-btn @click="signInWithGoogle()" class="mx-2" fab color="black" :loading="GoogleBtnloading" outlined>
+                          <v-btn
+                            @click="signInWithGoogle()"
+                            class="mx-2"
+                            fab
+                            color="black"
+                            :loading="GoogleBtnloading"
+                            outlined
+                          >
                             <v-icon>fab fa-google</v-icon>
                           </v-btn>
-                          <v-btn @click="signInWithTwitter()" class="mx-2" fab color="black" :loading="TwitterBtnloading" outlined>
+                          <v-btn
+                            @click="signInWithTwitter()"
+                            class="mx-2"
+                            fab
+                            color="black"
+                            :loading="TwitterBtnloading"
+                            outlined
+                          >
                             <v-icon>fab fa-twitter</v-icon>
                           </v-btn>
-                          <v-btn @click="signInWithGithub()" class="mx-2" fab color="black" :loading="GithubBtnloading" outlined>
+                          <v-btn
+                            @click="signInWithGithub()"
+                            class="mx-2"
+                            fab
+                            color="black"
+                            :loading="GithubBtnloading"
+                            outlined
+                          >
                             <v-icon>fab fa-github</v-icon>
                           </v-btn>
                         </div>
@@ -220,11 +241,30 @@ export default {
             localStorage.setItem("OpenAuth-user", JSON.stringify(result.user));
 
             localStorage.setItem("isAuthenticatedWithEmail", "true");
-            setTimeout(() => {
+            // checking if email address is verified
+            if (result.user.emailVerified === false) {
+              
+              // Show success message and redirect the user to sign in
+            this.$fire({
+              title: "Please verify your email address",
+              input: "email",
+              text: "In order to complete the sign-up process, please enter bellow your email address and click the activation link.",
+              type: "info",
+              showCancelButton: true,
+              }).then((email) => {
+                this.loading = false;
+                if (email) {
+                  console.log(email.value)
+                }
+              });
+
+            } else {
+              setTimeout(() => {
               this.loading = false;
               // redirecting user to Dashboard page
               this.$router.push({ name: "Dashboard" });
             }, 1500);
+            }
           })
           .catch(error => {
             console.log(error.message);
@@ -244,19 +284,48 @@ export default {
             this.signup_password
           )
           .then(() => {
+            // Sending the email Verification to the user
+            let user = firebase.auth().currentUser;
+            user.sendEmailVerification().then(function() {
+              localStorage.setItem(`emailVerificationSent`, `true`)
+            }).catch(function(error) {
+              this.$fire({
+                title: "Error",
+                text: error.message,
+                type: "error",
+                timer: 8000
+              }).then(() => {
+                this.loading = false;
+              });
+            });
+
+            // Saving displayName
             firebase.auth().currentUser.updateProfile({
               displayName: this.signup_name
             });
 
             localStorage.setItem("isAuthenticatedWithEmail", "true");
 
-            setTimeout(() => {
+            // Show success message and redirect the user to sign in
+            this.$fire({
+            title: "You have signed up successfully",
+            text: "Welcome to OpenAuth! We are glad you are with us! We have sent an email with an activation link to your email address. In order to complete the sign-up process, please click the activation link.",
+            type: "success",
+            timer: 6000
+            }).then(() => {
               this.loading = false;
               document.getElementById("signInButton").click();
-            }, 1500);
+            });
           })
           .catch(error => {
-            console.log(error.message);
+            this.$fire({
+            title: "Error",
+            text: error.message,
+            type: "error",
+            timer: 8000
+          }).then(() => {
+            this.loading = false;
+          });
           });
       } else {
         console.log("No data");
@@ -267,21 +336,27 @@ export default {
       this.FacebookBtnloading = true;
 
       const facebookProvider = new firebase.auth.FacebookAuthProvider();
-      auth.signInWithPopup(facebookProvider)
+      auth
+        .signInWithPopup(facebookProvider)
         .then(result => {
-
           localStorage.setItem("OpenAuth-user", JSON.stringify(result.user));
 
-            localStorage.setItem("isAuthenticatedWithEmail", "true");
-            setTimeout(() => {
-              this.FacebookBtnloading = false;
-              // redirecting user to Dashboard page
-              this.$router.push({ name: "Dashboard" });
-            }, 1000);
+          localStorage.setItem("isAuthenticatedWithEmail", "true");
+          setTimeout(() => {
+            this.FacebookBtnloading = false;
+            // redirecting user to Dashboard page
+            this.$router.push({ name: "Dashboard" });
+          }, 1000);
         })
         .catch(error => {
-          console.log(error);
-          console.log(error.message);
+          this.$fire({
+            title: "Error",
+            text: error.message,
+            type: "error",
+            timer: 8000
+          }).then(() => {
+            this.FacebookBtnloading = false;
+          });
         });
     },
     async signInWithGoogle() {
@@ -294,16 +369,22 @@ export default {
         .then(result => {
           localStorage.setItem("OpenAuth-user", JSON.stringify(result.user));
 
-            localStorage.setItem("isAuthenticatedWithEmail", "true");
-            setTimeout(() => {
-              this.GoogleBtnloading = false;
-              // redirecting user to Dashboard page
-              this.$router.push({ name: "Dashboard" });
-            }, 1000);
+          localStorage.setItem("isAuthenticatedWithEmail", "true");
+          setTimeout(() => {
+            this.GoogleBtnloading = false;
+            // redirecting user to Dashboard page
+            this.$router.push({ name: "Dashboard" });
+          }, 1000);
         })
         .catch(error => {
-          console.log(error);
-          console.log(error.message);
+          this.$fire({
+            title: "Error",
+            text: error.message,
+            type: "error",
+            timer: 8000
+          }).then(() => {
+            this.GoogleBtnloading = false;
+          });
         });
     },
     async signInWithTwitter() {
@@ -316,16 +397,22 @@ export default {
         .then(result => {
           localStorage.setItem("OpenAuth-user", JSON.stringify(result.user));
 
-            localStorage.setItem("isAuthenticatedWithEmail", "true");
-            setTimeout(() => {
-              this.TwitterBtnloading = false;
-              // redirecting user to Dashboard page
-              this.$router.push({ name: "Dashboard" });
-            }, 1000);
+          localStorage.setItem("isAuthenticatedWithEmail", "true");
+          setTimeout(() => {
+            this.TwitterBtnloading = false;
+            // redirecting user to Dashboard page
+            this.$router.push({ name: "Dashboard" });
+          }, 1000);
         })
         .catch(error => {
-          console.log(error);
-          console.log(error.message);
+          this.$fire({
+            title: "Error",
+            text: error.message,
+            type: "error",
+            timer: 8000
+          }).then(() => {
+            this.TwitterBtnloading = false;
+          });
         });
     },
     async signInWithGithub() {
@@ -338,16 +425,22 @@ export default {
         .then(result => {
           localStorage.setItem("OpenAuth-user", JSON.stringify(result.user));
 
-            localStorage.setItem("isAuthenticatedWithEmail", "true");
-            setTimeout(() => {
-              this.GithubBtnloading = false;
-              // redirecting user to Dashboard page
-              this.$router.push({ name: "Dashboard" });
-            }, 1000);
+          localStorage.setItem("isAuthenticatedWithEmail", "true");
+          setTimeout(() => {
+            this.GithubBtnloading = false;
+            // redirecting user to Dashboard page
+            this.$router.push({ name: "Dashboard" });
+          }, 1000);
         })
         .catch(error => {
-          console.log(error);
-          console.log(error.message);
+          this.$fire({
+            title: "Error",
+            text: error.message,
+            type: "error",
+            timer: 8000
+          }).then(() => {
+            this.GithubBtnloading = false;
+          });
         });
     }
   }
