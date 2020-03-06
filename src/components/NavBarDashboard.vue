@@ -17,7 +17,7 @@
       <div class="d-none d-sm-flex d-sm-none d-md-flex">
         <v-menu :open-on-hover="openOnHover" offset-y>
           <template v-slot:activator="{ on }">
-            <v-btn flat v-on="on" text>
+            <v-btn v-on="on" text>
               <v-icon left class="black--text">mdi-chevron-down</v-icon>
               <span class="black--text">Menu</span>
             </v-btn>
@@ -40,12 +40,19 @@
 
       <v-menu :open-on-hover="openOnHover" offset-y>
         <template v-slot:activator="{ on }">
-          <v-btn flat v-on="on" text>
-            <v-icon v-if="user.photoURL == '' || user.photoURL == null" x-large color="grey">mdi-account-circle</v-icon>
-
-            <v-avatar v-if="user.photoURL != null" class="profile" size="40">
-              <img :src="user.photoURL">
-            </v-avatar>
+          <v-btn v-on="on" text>
+            <div v-if="!user.photoURL">
+              <v-icon
+                v-if="user.photoURL == '' || user.photoURL == null"
+                x-large
+                color="grey"
+              >mdi-account-circle</v-icon>
+            </div>
+            <div v-if="user.photoURL">
+              <v-avatar v-if="user.photoURL != null" class="profile" size="40">
+                <img :src="user.photoURL" />
+              </v-avatar>
+            </div>
           </v-btn>
         </template>
         <v-list class="mb-4">
@@ -93,11 +100,19 @@
       <v-layout column align-center>
         <router-link to="profile" class="removeUnderline">
           <v-flex class="text-center mt-5 mb-4">
-            <v-icon v-if="user.photoURL == '' || user.photoURL == null" color="grey" size="110">mdi-account-circle</v-icon>
+            <div v-if="!user.photoURL">
+              <v-icon
+                v-if="user.photoURL == '' || user.photoURL == null"
+                color="grey"
+                size="110"
+              >mdi-account-circle</v-icon>
+            </div>
 
-            <v-avatar v-if="user.photoURL != null" class="profile" size="90">
-              <img :src="user.photoURL">
-            </v-avatar>
+            <div v-if="user.photoURL">
+              <v-avatar v-if="user.photoURL != null" class="profile" size="90">
+                <img :src="user.photoURL" />
+              </v-avatar>
+            </div>
           </v-flex>
           <p v-if="!user" class="black--text subheading mt-3">User E-mail</p>
           <p v-if="user" class="black--text subheading mt-3">{{ user.displayName }}</p>
@@ -150,7 +165,7 @@ import { auth } from "@/main";
 
 export default {
   name: "NavBarDashboard",
-  mounted() {
+  created() {
     if (localStorage.getItem("OpenAuth-user")) {
       this.user = JSON.parse(localStorage.getItem("OpenAuth-user") || "{}");
       this.permissions.admin = true;

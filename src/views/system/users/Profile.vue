@@ -11,17 +11,29 @@
                 <v-hover>
                   <template v-slot:default="{ hover }">
                     <v-card style="border-radius:60px">
-                      <v-icon v-if="user.photoURL == '' || user.photoURL == null" color="grey" size="110">mdi-account-circle</v-icon>
+                      <div v-if="!user.photoURL">
+                        <v-icon
+                          v-if="user.photoURL == '' || user.photoURL == null"
+                          color="grey"
+                          size="110"
+                        >mdi-account-circle</v-icon>
+                      </div>
 
-                      <v-avatar v-if="user.photoURL != null" style="border-radius:60px" size="100">
-                        <img :src="user.photoURL">
-                      </v-avatar>
+                      <div v-if="user.photoURL">
+                        <v-avatar
+                          v-if="user.photoURL != null"
+                          style="border-radius:60px"
+                          size="100"
+                        >
+                          <img :src="user.photoURL" />
+                        </v-avatar>
+                      </div>
 
                       <v-fade-transition>
                         <v-overlay v-if="hover" absolute color="grey">
-                          
-                          <v-btn text icon large @click="uploadPicture"><v-icon large>mdi-camera</v-icon></v-btn>
-                          
+                          <v-btn text icon large @click="uploadPicture">
+                            <v-icon large>mdi-camera</v-icon>
+                          </v-btn>
                         </v-overlay>
                         <v-overlay v-if="loading" absolute color="primary">
                           <v-btn text icon large :loading="loading"></v-btn>
@@ -69,7 +81,7 @@ export default {
   components: {
     NavBarDashboard
   },
-  mounted() {
+  created() {
     if (localStorage.getItem("OpenAuth-user")) {
       this.user = JSON.parse(localStorage.getItem("OpenAuth-user") || "{}");
       this.permissions.admin = true;
