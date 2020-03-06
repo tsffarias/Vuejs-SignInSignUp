@@ -41,9 +41,9 @@
       <v-menu :open-on-hover="openOnHover" offset-y>
         <template v-slot:activator="{ on }">
           <v-btn flat v-on="on" text>
-            <v-icon v-if="user.photoURL == ''" x-large color="grey">mdi-account-circle</v-icon>
+            <v-icon v-if="user.photoURL == '' || user.photoURL == null" x-large color="grey">mdi-account-circle</v-icon>
 
-            <v-avatar class="profile" size="40">
+            <v-avatar v-if="user.photoURL != null" class="profile" size="40">
               <img :src="user.photoURL">
             </v-avatar>
           </v-btn>
@@ -93,9 +93,9 @@
       <v-layout column align-center>
         <router-link to="profile" class="removeUnderline">
           <v-flex class="text-center mt-5 mb-4">
-            <v-icon v-if="user.photoURL == ''" color="grey" size="110">mdi-account-circle</v-icon>
+            <v-icon v-if="user.photoURL == '' || user.photoURL == null" color="grey" size="110">mdi-account-circle</v-icon>
 
-            <v-avatar class="profile" size="90">
+            <v-avatar v-if="user.photoURL != null" class="profile" size="90">
               <img :src="user.photoURL">
             </v-avatar>
           </v-flex>

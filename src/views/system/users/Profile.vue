@@ -11,9 +11,9 @@
                 <v-hover>
                   <template v-slot:default="{ hover }">
                     <v-card style="border-radius:60px">
-                      <v-icon v-if="user.photoURL == ''" color="grey" size="110">mdi-account-circle</v-icon>
+                      <v-icon v-if="user.photoURL == '' || user.photoURL == null" color="grey" size="110">mdi-account-circle</v-icon>
 
-                      <v-avatar style="border-radius:60px" size="100">
+                      <v-avatar v-if="user.photoURL != null" style="border-radius:60px" size="100">
                         <img :src="user.photoURL">
                       </v-avatar>
 

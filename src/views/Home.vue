@@ -240,23 +240,26 @@ export default {
   methods: {
     async signIn() {
       if (this.login_email && this.login_password) {
-        // button loader
+        // Button loader
         this.loading = true;
 
         await auth
           .signInWithEmailAndPassword(this.login_email, this.login_password)
           .then(result => {
-            console.log(result);
+            // Setting user data to localStorage
             localStorage.setItem("OpenAuth-user", JSON.stringify(result.user));
 
-            // checking if email address is verified
+            // Checking if email address is verified
             if (result.user.emailVerified === false) {
               // Sending the email Verification to the user
               let user = firebase.auth().currentUser;
               user
                 .sendEmailVerification()
                 .then(function() {
+                  auth.signOut();
                   localStorage.setItem(`emailVerificationSent`, `true`);
+                  localStorage.removeItem("isAuthenticatedWithEmail");
+                  localStorage.removeItem("OpenAuth-user");
                 })
                 .catch(function(error) {
                   this.$fire({
@@ -283,7 +286,7 @@ export default {
               setTimeout(() => {
                 this.loading = false;
                 localStorage.setItem("isAuthenticatedWithEmail", "true");
-                // redirecting user to Dashboard page
+                // Redirecting user to Dashboard page
                 this.$router.push({ name: "Dashboard" });
               }, 1500);
             }
@@ -294,8 +297,6 @@ export default {
             this.snackbarText = error.message;
             this.loading = false;
           });
-      } else {
-        console.log("No data");
       }
     },
     async signUp() {
@@ -338,7 +339,7 @@ export default {
             this.$fire({
               title: "You have signed up successfully",
               text:
-                "Welcome to OpenAuth! We are glad you are with us! We have sent an email with an activation link to your email address. In order to complete the sign-up process, please click the activation link.",
+                "We have sent an email with an activation link to your email address.",
               type: "success",
               timer: 6000
             }).then(() => {
