@@ -81,7 +81,7 @@
                             @click:append="showPasswordSignIn = !showPasswordSignIn"
                           ></v-text-field>
 
-                          <h3 class="text-center mt-3">
+                          <h3 class="text-center mt-3 cursor" @click="forgotPassword">
                             <v-icon small color="black" dark left>mdi-key</v-icon>Forgot your password?
                           </h3>
 
@@ -253,19 +253,21 @@ export default {
             if (result.user.emailVerified === false) {
               // Sending the email Verification to the user
               let user = firebase.auth().currentUser;
-              user.sendEmailVerification().then(function() {
-                localStorage.setItem(`emailVerificationSent`, `true`);
-              })
-              .catch(function(error) {
-                this.$fire({
-                  title: "Error",
-                  text: error.message,
-                  type: "error",
-                  timer: 8000
-                }).then(() => {
-                  this.loading = false;
+              user
+                .sendEmailVerification()
+                .then(function() {
+                  localStorage.setItem(`emailVerificationSent`, `true`);
+                })
+                .catch(function(error) {
+                  this.$fire({
+                    title: "Error",
+                    text: error.message,
+                    type: "error",
+                    timer: 8000
+                  }).then(() => {
+                    this.loading = false;
+                  });
                 });
-              });
 
               // Show info message and redirect the user to sign in
               this.$fire({
@@ -273,16 +275,16 @@ export default {
                 text:
                   "We have sent an email with an activation link to your email address. In order to complete the sign-up process, please click the activation link.",
                 type: "info",
-                confirmButtonText: '<i class="fa fa-thumbs-up"></i> OK!',
+                confirmButtonText: '<i class="fa fa-thumbs-up"></i> OK!'
               }).then(() => {
-                this.loading = false;                
-              })
+                this.loading = false;
+              });
             } else {
               setTimeout(() => {
                 this.loading = false;
                 localStorage.setItem("isAuthenticatedWithEmail", "true");
                 // redirecting user to Dashboard page
-                this.$router.push({ name: "Dashboard" })
+                this.$router.push({ name: "Dashboard" });
               }, 1500);
             }
           })
@@ -357,6 +359,41 @@ export default {
       } else {
         console.log("No data");
       }
+    },
+    async forgotPassword() {
+      this.$fire({
+        title: "Forgot your password?",
+        type: "info",
+        showCloseButton: true,
+        showCancelButton: true,
+        input: "email",
+        confirmButtonText: '<i class="fas fa-envelope"></i> Send Email!',
+        inputPlaceholder: "Enter your email address"
+      }).then(email => {
+        // Sending reset email to user
+        if (email) {
+          auth
+            .sendPasswordResetEmail(email.value)
+            .then(() => {
+              // showing success message
+              this.$fire({
+                type: "success",
+                title: `Password Reset Email Sent`,
+                html: `An email was sent to ${email.value}`,
+                showConfirmButton: false,
+                timer: 4000
+              });
+            })
+            .catch(error => {
+              this.$fire({
+                type: "error",
+                title: `Error`,
+                text: error.message,
+                timer: 4000
+              });
+            });
+        }
+      });
     },
     async signInWithFacebook() {
       // button loader
@@ -474,3 +511,8 @@ export default {
 };
 </script>
 
+<style>
+.cursor {
+  cursor: pointer;
+}
+</style>
